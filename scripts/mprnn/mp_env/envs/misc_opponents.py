@@ -25,11 +25,12 @@ class Opponent():
 class MatchingPenniesOpponent(Opponent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs) 
-        self.alpha = kwargs.get('lr',0.1)
+        self.alpha = 0.1
         self.pComputerRight = 0.5
         self.bias = 0
         self.biasDepth = -1
         self.maxDev = 0
+        self.maxdepth = 1
     
     def __str__(self):
         return 'MatchingPenniesOpponent(alpha={})'.format(self.alpha)
@@ -37,13 +38,13 @@ class MatchingPenniesOpponent(Opponent):
     def step(self, choice, rew):
 
         if choice is None:
-            return (1 if random() < pComputerRight else 0), pComputerRight, [0,-1,0,0,const_bias]
+            return (1 if random() < self.pComputerRight else 0), self.pComputerRight, [0,-1,0,0,const_bias]
         data = np.array(choice)
         choice, rew = np.array(choice) + 1, np.array(rew) + 1 #recode as 1/2
         choice = np.append(choice,None)
         rew = np.append(rew,None)
 
-        for depth in range(maxdepth):
+        for depth in range(self.maxdepth):
             if len(data) < depth + 1:
                 continue
             if depth == 0: #count all right choices to check overall side bias
@@ -66,15 +67,15 @@ class MatchingPenniesOpponent(Opponent):
             pLeftBias = binom_test(countRight,countN,0.5) #p(X<=x)
             pDeviation = countRight / countN - 0.5 #p(Right)
 
-            if pRightBias < testAlpha or pLeftBias < testAlpha and \
-            np.abs(pDeviation) > np.abs(maxDev):
-                    maxDev = pDeviation
-                    bias = 1 if maxDev < 0 else 2
-                    biasDepth = depth
-                    pComputerRight = 0.5 - maxDev
+            if pRightBias < self.alpha or pLeftBias < self.alpha and \
+            np.abs(pDeviation) > np.abs(self.maxDev):
+                    self.maxDev = pDeviation
+                    self.bias = 1 if self.maxDev < 0 else 2
+                    self.biasDepth = depth
+                    self.pComputerRight = 0.5 - self.maxDev
 
 
-        for depth in range(maxdepth):
+        for depth in range(self.maxdepth):
             if len(data) < depth+1:
                 continue
             chistseq = np.empty(len(choice))
@@ -97,17 +98,17 @@ class MatchingPenniesOpponent(Opponent):
             pLeftBias = binom_test(countRight,countN,0.5) #p(X<=x)
             pDeviation = countRight / countN - 0.5 #p(Right)
 
-            if pRightBias < testAlpha or pLeftBias < testAlpha and \
-                np.abs(pDeviation) > np.abs(maxDev):
-                    maxDev = pDeviation
-                    bias = 1 if maxDev < 0 else 2
-                    biasDepth = depth
-                    pComputerRight = 0.5 - maxDev
+            if pRightBias < self.alpha or pLeftBias < self.alpha and \
+                np.abs(pDeviation) > np.abs(self.maxDev):
+                    self.maxDev = pDeviation
+                    self.bias = 1 if self.maxDev < 0 else 2
+                    self.biasDepth = depth
+                    self.pComputerRight = 0.5 - self.maxDev
 
-        biasInfo = [bias,biasDepth,maxDev]
+        biasInfo = [self.bias,self.biasDepth,self.maxDev]
         #might need to flip 0 and 1!
-        computerChoice = 1 if random() < pComputerRight  else 0
-        return computerChoice,pComputerRight,biasInfo
+        computerChoice = 1 if random() < self.pComputerRight  else 0
+        return computerChoice,self.pComputerRight,biasInfo
 
 class InfluenceOpponent(Opponent):
     def __init__(self, **kwargs):
