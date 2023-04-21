@@ -6,13 +6,13 @@ from mprnn.utils import FILEPATH
 import numpy as np
 import neurogym as ngym
 from neurogym import spaces
-from .misc_opponents import SoftmaxQlearn, PatternBandit, MimicryPlayer
+from .misc_opponents import SoftmaxQlearn, PatternBandit, MimicryPlayer, MatchingPenniesOpponent
 from .mp_data_collection import DataCollector
 from .mp_data_collection import SAVE_STEPS, STORE_STEPS
 
 rng = np.random.default_rng()
 
-
+ 
 class MPEnv(ngym.TrialEnv):
 
     def __init__(self, dt=100, timing=None, rewards=None, train=True, show_opp=True,
@@ -39,7 +39,7 @@ class MPEnv(ngym.TrialEnv):
         self.episodic = episodic
         self.testing_opp_params = None
         self.all_opponents = ['patternbandit', 
-                              'softmaxqlearn', 'mimicry']  # list opponent names
+                              'softmaxqlearn', 'mimicry', 'all']  # list opponent names
         if opponents is None:
             self.opponents = self.all_opponents
         else:
@@ -110,6 +110,8 @@ class MPEnv(ngym.TrialEnv):
             opp = PatternBandit(**opp_kwargs)
         elif opponent == "mimicry":
             opp = MimicryPlayer(**opp_kwargs)
+        elif opponent == "all":
+            opp = MatchingPenniesOpponent(**opp_kwargs)
         else:
             raise ValueError("Agent type not found")
         self.opponent_name = str(opponent)
