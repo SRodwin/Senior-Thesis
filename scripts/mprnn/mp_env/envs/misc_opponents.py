@@ -140,8 +140,8 @@ class InfluenceOpponent(Opponent):
 class SoftmaxQlearn(Opponent):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        self.alpha = 0.5 # 0.2, 0.5, 0.8
-        self.beta = 0.8 # 0.2, 0.5, 0.8
+        self.alpha = 0.8 # 0.2, 0.5, 0.8
+        self.beta = 0.2 # 0.2, 0.5, 0.8
         self.Qs = np.zeros((2))
         self.max_choices = []
 
