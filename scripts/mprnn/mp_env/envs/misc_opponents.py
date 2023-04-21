@@ -30,7 +30,7 @@ class MatchingPenniesOpponent(Opponent):
         self.bias = 0
         self.biasDepth = -1
         self.maxDev = 0
-        self.maxdepth = 2
+        self.maxdepth = 1
     
     def __str__(self):
         return 'MatchingPenniesOpponent(alpha={})'.format(self.alpha)
@@ -45,7 +45,7 @@ class MatchingPenniesOpponent(Opponent):
         rew = np.append(rew,None)
 
         for depth in range(self.maxdepth):
-            if len(data) < depth + 1:
+            if data.size < depth + 1:
                 continue
             if depth == 0: #count all right choices to check overall side bias
                 countN = len(choice)
@@ -76,7 +76,7 @@ class MatchingPenniesOpponent(Opponent):
 
 
         for depth in range(self.maxdepth):
-            if len(data) < depth+1:
+            if data.size < depth+1:
                 continue
             chistseq = np.empty(len(choice))
             rhistseq = np.empty(len(rew))
