@@ -206,7 +206,7 @@ class PatternBandit(Opponent):
 class MimicryPlayer(Opponent):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        self.n = 1
+        self.n = 2
         self.acts_inframe = [] #we don't care about act_hist, but rather only the last n choices
     def __str__(self):
         return f"t-{self.n} mimicry"
