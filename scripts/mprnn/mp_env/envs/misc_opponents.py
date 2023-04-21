@@ -184,7 +184,7 @@ class PatternBandit(Opponent):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
-        self.pattern = kwargs.get('pattern','01') #fixed pattern to play
+        self.pattern = [random.randint(0, 1) for i in range(1)] #fixed pattern to play
         self.plen = len(self.pattern)
         self.count = 0
         self.max_choices = []
