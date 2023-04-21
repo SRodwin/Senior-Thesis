@@ -328,7 +328,7 @@ class MPEnv(ngym.TrialEnv):
 
                 # print(f'steps: {self.total_num_steps} agent: {self.action} opponent: {self.opponent_action} history: {history}')
 
-                if self.opponent_name == 'patternbandit' or self.opponent_name == 'mimicry':
+                if self.opponent_name == 'patternbandit' or self.opponent_name == 'mimicry' or self.opponent_name == 'softmaxqlearn':
                     self.data_collector.check_save(
                         self.opponent_action, self.action, self.num_steps, self.total_num_steps, history, self.pr)
 
