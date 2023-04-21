@@ -30,7 +30,7 @@ class MatchingPenniesOpponent(Opponent):
         self.bias = 0
         self.biasDepth = -1
         self.maxDev = 0
-        self.maxdepth = 1
+        self.maxdepth = 2
     
     def __str__(self):
         return 'MatchingPenniesOpponent(alpha={})'.format(self.alpha)
