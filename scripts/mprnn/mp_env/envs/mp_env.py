@@ -147,48 +147,6 @@ class MPEnv(ngym.TrialEnv):
                 break
         opp_kwargs = {}
         # if we are using the generated versions rather than the default
-        gen = self.opp_params is not None
-        if gen:
-            # params is a dict of lists of the set of parameters to draw from
-            params = self.opp_params[str(opponent)]
-        if opponent == 'patternbandit':
-            # get rid of the binary numbers with only 1s ,*range(16,31)
-            if gen:
-                lengths = params['length']
-                # random draw of the length (this makes it evenly distributed)
-                length = rng.choice(lengths)
-                # ex: length 5 = range(16,31) --> 2**4: 2**5 - 1
-                l = list(range(2**(length-1), 2**length-1))
-            else:
-                l = [*range(4, 7), *range(8, 15)]
-            opp_kwargs['pattern'] = bin(rng.choice(l))[2:]
-
-        if type(opponent) == str and opponent[-6:] == "qlearn":
-            if gen:
-                lr = params['lr']
-                gamma = params['gamma']
-                bias = params['bias']
-                opp_kwargs['lr'] = rng.choice(lr)
-                opp_kwargs['gamma'] = rng.choice(gamma)
-                opp_kwargs['bias'] = rng.choice(bias)
-            else:
-                opp_kwargs['lr'] = rng.choice([0.25, 0.5, 1])
-                opp_kwargs['gamma'] = rng.choice([0.5, 0.6, 0.75, 0.9, 0.99])
-                opp_kwargs['bias'] = rng.choice(
-                    [0, -0.02, -0.05, 0.02, 0.05], p=[0.5, 0.1, 0.15, 0.1, 0.15])
-        if opponent == "softmaxqlearn":
-            if gen:
-                temp = params['temp']
-                opp_kwargs['temp'] = rng.choice(temp)
-            else:
-                opp_kwargs['temp'] = rng.choice([0.1, 0.5, 1, 2, 3])
-       
-        if opponent == "mimicry":
-            if gen:
-                n = params['n']
-                opp_kwargs['n'] = rng.choice(n)
-            else:
-                opp_kwargs['n'] = rng.choice(np.arange(0, 5))
 
         return self.set_opponent(opponent, **opp_kwargs)
 
