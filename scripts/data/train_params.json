@@ -20,7 +20,7 @@
         }
     },
 "env": {
-    "train_opponents": ["mimicry"],
+    "train_opponents": ["influence"],
     "all_opponents": ["patternbandit","all", "mimicry", "softmaxqlearn", "1", "2", "influence"],
     "show_opp":false,
     "reset_time": 150,
