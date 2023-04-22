@@ -113,8 +113,8 @@ class MatchingPenniesOpponent(Opponent):
 class InfluenceOpponent(Opponent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs) 
-        self.lr_1 = kwargs.get('lr_1', 0.1) # 0.2, 0.5, 0.8
-        self.lr_2 = kwargs.get('lr_2', 0.1) # 0.2, 0.5, 0.8
+        self.lr_1 = 0.2 # 0.2, 0.5, 0.8
+        self.lr_2 = 0.2 # 0.2, 0.5, 0.8
         q_ss = 0.5 # This is the iniial q** as we are assuming that initial choice is random 
         
         
@@ -125,17 +125,44 @@ class InfluenceOpponent(Opponent):
     def step(self, choice, rew):
         action = 0
         # Get Qt 
+        Qt = self.act_history[-1] if len(self.act_history) > 0 else 0.5
+        
         # Get q** 
+        q_ss = self.q_ss
+        
         # Calculate V(R) and V(L) for Qt and q** 
+        V_R_Qt = (1 - Qt) * 1 + Qt * 0
+        V_L_Qt = (1 - Qt) * 0 + Qt * 1
+        V_R_q_ss = (1 - q_ss) * 0 + q_ss * 1
+        V_L_q_ss = (1 - q_ss) * 1 + q_ss * 0
+       
         # Calculate z 
+        z1 = self.q_ss - (1 - self.q_ss)
+        z2 = Qt - (1 - Qt)
+        
+        
         # Calculate soft max for Qt and q**
+        soft_max_Qt = 1 / (1 + np.exp(-z2 * self.lr_2))
+        soft_max_q_star = 1 / (1 + np.exp(-z1 * self.lr_1))
+      
         # Calculate delta p* 
+        delta_p_star =  soft_max_Qt - soft_max_q_star
+        
         # Calculate T 
+        T = self.lr_2 * delta_p_star
+        
         # Calculate p_2*
+        p_2_star = qss + self.lr_1(choice - q_ss) + T
+        
         # Decide action 
+        if np.random.rand() < p_2_star:
+            action = 1
         
         # Update act_history and q** 
-        return action
+        self.act_history.append(action)
+        self.q_ss = q_ss + self.lr_1(Qt - q_ss)
+        
+        return action,self.q_ss,None 
 
         
 class SoftmaxQlearn(Opponent):
