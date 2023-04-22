@@ -152,7 +152,7 @@ class InfluenceOpponent(Opponent):
         T = self.lr_2 * delta_p_star
         
         # Calculate p_2*
-        p_2_star = qss + self.lr_1(choice - q_ss) + T
+        p_2_star = q_ss + self.lr_1(choice - q_ss) + T
         
         # Decide action 
         if np.random.rand() < p_2_star:
