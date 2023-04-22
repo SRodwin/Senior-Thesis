@@ -21,7 +21,7 @@ tf.compat.v1.disable_eager_execution()
 
 rng = np.random.default_rng()
 
-BETTER_NAMES = {"lrplayer":"Linear Combination","1":"MP 1st",'all':"MP 1st+2nd",
+BETTER_NAMES = {"influence":"Influence Opponent","1":"MP 1st",'all':"MP 1st+2nd",
                 'reversalbandit':"anti-correlated",'patternbandit':"Patterns",
             'softmaxqlearn':'Softmax QL','epsilonqlearn':'$\epsilon$-Greedy QL','mimicry':"n-back mimickry"}
 FILEPATH = Path(__file__).parent.parent.absolute()
