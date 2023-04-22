@@ -115,7 +115,7 @@ class InfluenceOpponent(Opponent):
         super().__init__(**kwargs) 
         self.lr_1 = 0.8 # 0.2, 0.5, 0.8
         self.lr_2 = 0.8 # 0.2, 0.5, 0.8
-        q_ss = 0.5 # This is the iniial q** as we are assuming that initial choice is random 
+        self.q_ss = 0.5 # This is the iniial q** as we are assuming that initial choice is random 
         
         
     def __str__(self):
