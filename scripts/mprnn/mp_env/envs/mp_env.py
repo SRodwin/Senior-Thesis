@@ -6,7 +6,7 @@ from mprnn.utils import FILEPATH
 import numpy as np
 import neurogym as ngym
 from neurogym import spaces
-from .misc_opponents import SoftmaxQlearn, PatternBandit, MimicryPlayer, MatchingPenniesOpponent
+from .misc_opponents import SoftmaxQlearn, PatternBandit, MimicryPlayer, MatchingPenniesOpponent, InfluenceOpponent
 from .mp_data_collection import DataCollector
 from .mp_data_collection import SAVE_STEPS, STORE_STEPS
 
@@ -39,7 +39,7 @@ class MPEnv(ngym.TrialEnv):
         self.episodic = episodic
         self.testing_opp_params = None
         self.all_opponents = ['patternbandit', 
-                              'softmaxqlearn', 'mimicry', 'all']  # list opponent names
+                              'softmaxqlearn', 'mimicry', 'all', 'influence']  # list opponent names
         if opponents is None:
             self.opponents = self.all_opponents
         else:
@@ -112,6 +112,8 @@ class MPEnv(ngym.TrialEnv):
             opp = MimicryPlayer(**opp_kwargs)
         elif opponent == "all":
             opp = MatchingPenniesOpponent(**opp_kwargs)
+        elif opponent == "influence":
+            opp = InfluenceOpponent(**opp_kwargs)
         else:
             raise ValueError("Agent type not found")
         self.opponent_name = str(opponent)
@@ -330,7 +332,7 @@ class MPEnv(ngym.TrialEnv):
 
                 # print(f'steps: {self.total_num_steps} agent: {self.action} opponent: {self.opponent_action} history: {history}')
 
-                if self.opponent_name == 'patternbandit' or self.opponent_name == 'mimicry' or self.opponent_name == 'softmaxqlearn' or self.opponent_name == 'all':
+                if self.opponent_name == 'patternbandit' or self.opponent_name == 'mimicry' or self.opponent_name == 'softmaxqlearn' or self.opponent_name == 'all' or self.opponent_name == 'influence':
                     self.data_collector.check_save(
                         self.opponent_action, self.action, self.num_steps, self.total_num_steps, history, self.pr)
 
