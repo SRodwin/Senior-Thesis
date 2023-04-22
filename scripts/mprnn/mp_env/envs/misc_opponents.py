@@ -125,7 +125,7 @@ class InfluenceOpponent(Opponent):
     def step(self, choice, rew):
         action = 0
         # Get Qt 
-        Qt = self.act_history[-1] if len(self.act_history) > 0 else 0.5
+        Qt = self.act_hist[-1] if len(self.act_hist) > 0 else 0.5
         
         # Get q** 
         q_ss = self.q_ss
@@ -159,7 +159,7 @@ class InfluenceOpponent(Opponent):
             action = 1
         
         # Update act_history and q** 
-        self.act_history.append(action)
+        self.act_hist.append(action)
         self.q_ss = q_ss + self.lr_1(Qt - q_ss)
         
         return action,self.q_ss,None 
