@@ -145,7 +145,14 @@
                 "stop":6,
                 "step":1
                 }
-            }    
+            }
+        "influence":{
+            "lr":{
+                "start":0.25,
+                "stop":1.0,
+                "step":0.5
+                }
+            }   
         }
     }
 }
