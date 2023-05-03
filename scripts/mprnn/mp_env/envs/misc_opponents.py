@@ -110,8 +110,10 @@ class MatchingPenniesOpponent(Opponent):
         computerChoice = 1 if random() < self.pComputerRight  else 0
         return computerChoice,self.pComputerRight,biasInfo
 
+
 class InfluenceOpponent(Opponent):
     def __init__(self, **kwargs):
+        super().__init__(**kwargs) 
         self.beta = 2
         self.beta2 = 10
         self.omega = 0.5
@@ -141,7 +143,7 @@ class InfluenceOpponent(Opponent):
             opp_choice = 1
 
         #updating p_star based on agent's probability of right choice
-        update_p_star_via_choice = choice[-1] - self.p_star  #[-1 1]
+        update_p_star_via_choice = choice - self.p_star  #[-1 1]
 
         
         #update q_ss (agent's estimate of opponent's probability of right)
