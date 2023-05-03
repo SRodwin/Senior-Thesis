@@ -112,10 +112,14 @@ class MatchingPenniesOpponent(Opponent):
 
 class InfluenceOpponent(Opponent):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs) 
-        self.lr_1 = 0.8 # 0.2, 0.5, 0.8
-        self.lr_2 = 0.5 # 0.2, 0.5, 0.8
+        self.beta = 2
+        self.beta2 = 10
+        self.omega = 0.5
+        self.lr_1 = 0.2 # 0.2, 0.5, 0.8
+        self.lr_2 = 0.2 # 0.2, 0.5, 0.8
+        self.p_star = 0.5
         self.q_ss = 0.5 # This is the iniial q** as we are assuming that initial choice is random 
+        
         
         
     def __str__(self):
@@ -123,46 +127,58 @@ class InfluenceOpponent(Opponent):
     
     
     def step(self, choice, rew):
-        action = 0
-        # Get Qt 
-        Qt = self.act_hist[-1] if len(self.act_hist) > 0 else 0.5
+        opp_choice = 0
+        #generate opponent's choice at t based on p_star and payoff matrix
+        v_opp_right = 1 - self.p_star
+        v_opp_left = self.p_star
+
+        # choice output of opponent at time step t
+        #  -1 <= v_opp_right-v_opp_left <= 1
+        # with beta==1, 0.269<=opp_PR<=0.7311
+        opp_PR = 1 / (1 + np.exp(-self.beta * (v_opp_right - v_opp_left)))
+
+        if np.random.rand() < opp_PR:
+            opp_choice = 1
+
+        #updating p_star based on agent's probability of right choice
+        update_p_star_via_choice = choice[-1] - self.p_star  #[-1 1]
+
         
-        # Get q** 
-        q_ss = self.q_ss
+        #update q_ss (agent's estimate of opponent's probability of right)
+        update_q_ss = self.q_ss + self.lr_2 * (opp_choice - self.q_ss)  #[-1 1]
         
-        # Calculate V(R) and V(L) for Qt and q** 
-        V_R_Qt = (1 - Qt) * 1 + Qt * 0
-        V_L_Qt = (1 - Qt) * 0 + Qt * 1
-        V_R_q_ss = (1 - q_ss) * 0 + q_ss * 1
-        V_L_q_ss = (1 - q_ss) * 1 + q_ss * 0
-       
-        # Calculate z 
-        z1 = self.q_ss - (1 - self.q_ss)
-        z2 = Qt - (1 - Qt)
+        # use payoff matrix to calcuate agent's values of left and right choice
+        # based on the estimated probability of opponent's right choice
+        v_ag_right_via_qss1 = self.q_ss
+        v_ag_left_via_qss1 = 1 - self.q_ss
+        #agent's p_star based on q_ss at the previous step
+        p_star_via_qss1 = 1 / (1 + np.exp(-self.beta2 * (v_ag_right_via_qss1 - v_ag_left_via_qss1)))
+                    
+        v_ag_right_via_qss2 = update_q_ss
+        v_ag_left_via_qss2 = 1 - update_q_ss
+        #agent's p_star based on q_ss at the current step
+
+        # agent's p_star based on q_ss at the current step
+        p_star_via_qss2 = 1 / (1 + np.exp(-self.beta2 * (v_ag_right_via_qss2 - v_ag_left_via_qss2)))
+
+        # estimated change in p_star due to the change in q_ss
+        # from the previous time step
+        # second-order belief-based update of P_star
+        delta_p_star_via_qss = p_star_via_qss2 - p_star_via_qss1 #[-0.9 0.9]
+        wavg = self.omega*update_p_star_via_choice+(1-self.omega)*delta_p_star_via_qss
+        p_star_old = self.p_star
+
+
+        self.p_star = self.p_star+self.lr_1*wavg
+        if self.p_star < 0:
+            self.p_star = 0 
+        if self.p_star > 1:
+            self.p_star = 1
+        self.q_ss = update_q_ss
         
-        
-        # Calculate soft max for Qt and q**
-        soft_max_Qt = 1 / (1 + np.exp(-z2 * self.lr_2))
-        soft_max_q_star = 1 / (1 + np.exp(-z1 * self.lr_1))
+        return opp_choice, p_star_old,None 
       
-        # Calculate delta p* 
-        delta_p_star =  soft_max_Qt - soft_max_q_star
-        
-        # Calculate T 
-        T = self.lr_2 * delta_p_star
-        
-        # Calculate p_2*
-        p_2_star = q_ss + self.lr_1 * (choice - q_ss) + T
-        
-        # Decide action 
-        if np.random.rand() < p_2_star:
-            action = 1
-        
-        # Update act_history and q** 
-        self.act_hist.append(action)
-        self.q_ss = q_ss + self.lr_1 * (Qt - q_ss)
-        
-        return action,self.q_ss,None 
+         
 
         
 class SoftmaxQlearn(Opponent):
